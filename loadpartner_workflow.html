@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoadPartner TMS Workflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+        }
+        
+        .workflow-section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: #34495e;
+            margin-bottom: 25px;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .phase {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 6px solid #3498db;
+            position: relative;
+        }
+        
+        .phase-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .phase-number {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .phase-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .actors {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .actor {
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .actor.system {
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+        
+        .actor.broker {
+            border-color: #f39c12;
+            color: #f39c12;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .step {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #9b59b6;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-action {
+            font-weight: 600;
+            color: #8e44ad;
+            margin-bottom: 8px;
+        }
+        
+        .step-description {
+            font-size: 0.9rem;
+            color: #5d6d7e;
+            line-height: 1.4;
+        }
+        
+        .code-snippet {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+        
+        .state-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .state {
+            background: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .state.active {
+            background: #e74c3c;
+            transform: scale(1.1);
+        }
+        
+        .arrow {
+            font-size: 1.5rem;
+            color: #7f8c8d;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #f39c12;
+        }
+        
+        .highlight-box h4 {
+            color: #d68910;
+            margin-bottom: 10px;
+        }
+        
+        .data-flow {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .data-flow h4 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .database-ops {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .db-op {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #495057;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .state-flow {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LoadPartner TMS Workflow</h1>
+            <p>Complete System Flow: From Customer Inquiry to Payment</p>
+        </div>
+
+        <div class="workflow-section">
+            <h2 class="section-title">🏢 Multi-Tenant Context</h2>
+            <div class="highlight-box">
+                <h4>Remember: Each Organization = Separate Freight Brokerage</h4>
+                <p>ABC Freight Brokerage and DEF Logistics both use LoadPartner, but see completely different data. Each has their own customers, carriers, and shipments.</p>
+            </div>
+        </div>
+
+        <div class="workflow-section">
+            <h2 class="section-title">📋 Phase 1: Customer Inquiry & Quote</h2>
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">1</div>
+                    <div class="phase-title">Initial Customer Contact</div>
+                </div>
+                
+                <div class="actors">
+                    <div class="actor">Customer (Shipper)</div>
+                    <div class="actor broker">Freight Broker</div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-action">📞 Customer Inquiry</div>
+                        <div class="step-description">"Need to ship 20 pallets from Chicago to Miami, ASAP"</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">➕ Create/Find Customer</div>
+                        <div class="step-description">Broker uses CreateCustomer action if new client</div>
+                        <div class="code-snippet">CreateCustomer::handle($customerData)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📍 Setup Facilities</div>
+                        <div class="step-description">Add pickup and delivery locations</div>
+                        <div class="code-snippet">CreateCustomerFacility::handle($facilityData)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">💰 Manual Quote</div>
+                        <div class="step-description">Broker calculates quote based on experience, market rates, distance</div>
+                    </div>
+                </div>
+
+                <div class="data-flow">
+                    <h4>📊 Database Operations</h4>
+                    <div class="database-ops">
+                        <div class="db-op">INSERT customers (organization_id, name, ...)</div>
+                        <div class="db-op">INSERT facilities (customer_id, address, ...)</div>
+                        <div class="db-op">INSERT contacts (contactable_type, ...)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow-section">
+            <h2 class="section-title">✅ Phase 2: Quote Acceptance & Shipment Creation</h2>
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">2</div>
+                    <div class="phase-title">Booking the Load</div>
+                </div>
+
+                <div class="actors">
+                    <div class="actor">Customer</div>
+                    <div class="actor broker">Freight Broker</div>
+                    <div class="actor system">LoadPartner System</div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-action">✅ Quote Accepted</div>
+                        <div class="step-description">Customer agrees: "Yes, ship it for $3,000"</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📦 Create Shipment</div>
+                        <div class="step-description">Broker creates shipment record in system</div>
+                        <div class="code-snippet">CreateShipment::handle($shipmentData)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">🛣️ Define Stops</div>
+                        <div class="step-description">Setup pickup and delivery stops with dates/times</div>
+                        <div class="code-snippet">UpdateShipmentStops::handle($stopsData)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📋 Initial State</div>
+                        <div class="step-description">Shipment created in "Pending" state</div>
+                    </div>
+                </div>
+
+                <div class="state-flow">
+                    <div class="state active">Pending</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Booked</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Dispatched</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Delivered</div>
+                </div>
+
+                <div class="data-flow">
+                    <h4>📊 Database Operations</h4>
+                    <div class="database-ops">
+                        <div class="db-op">INSERT shipments (organization_id, customer_id, state='pending')</div>
+                        <div class="db-op">INSERT shipment_stops (shipment_id, type, facility_id)</div>
+                        <div class="db-op">INSERT audit_logs (auditable_type='shipment', event='created')</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow-section">
+            <h2 class="section-title">🚛 Phase 3: Carrier Selection & Booking</h2>
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">3</div>
+                    <div class="phase-title">Finding Transportation</div>
+                </div>
+
+                <div class="actors">
+                    <div class="actor broker">Freight Broker</div>
+                    <div class="actor">Carriers (Trucking Companies)</div>
+                    <div class="actor system">LoadPartner System</div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-action">🔍 Find Carriers</div>
+                        <div class="step-description">Check internal database or external load boards</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📞 Negotiate Rates</div>
+                        <div class="step-description">"Can you haul Chicago→Miami for $2,500?"</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">➕ Add/Update Carrier</div>
+                        <div class="step-description">Create carrier if new, or update existing</div>
+                        <div class="code-snippet">CreateCarrier::handle($carrierData)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">🤝 Book the Load</div>
+                        <div class="step-description">Assign carrier to shipment</div>
+                        <div class="code-snippet">UpdateShipmentCarrierDetails::handle($data)</div>
+                    </div>
+                </div>
+
+                <div class="state-flow">
+                    <div class="state">Pending</div>
+                    <div class="arrow">→</div>
+                    <div class="state active">Booked</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Dispatched</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Delivered</div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>💡 Profit Calculation</h4>
+                    <p>Customer Rate: $3,000 | Carrier Rate: $2,500 | Gross Profit: $500</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow-section">
+            <h2 class="section-title">📨 Phase 4: Dispatch & Documentation</h2>
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">4</div>
+                    <div class="phase-title">Load Dispatch</div>
+                </div>
+
+                <div class="actors">
+                    <div class="actor broker">Freight Broker</div>
+                    <div class="actor">Carrier Dispatcher</div>
+                    <div class="actor system">LoadPartner System</div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-action">📋 Generate Documents</div>
+                        <div class="step-description">Create rate confirmation, shipping instructions</div>
+                        <div class="code-snippet">GenerateRateConfirmation::handle($shipment)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📤 Dispatch Load</div>
+                        <div class="step-description">Send all paperwork to carrier</div>
+                        <div class="code-snippet">DispatchShipment::handle($shipmentId)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📝 Add Notes</div>
+                        <div class="step-description">Log communication and special instructions</div>
+                        <div class="code-snippet">CreateNote::handle($noteData)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📱 Notify Parties</div>
+                        <div class="step-description">Email confirmations to customer and carrier</div>
+                    </div>
+                </div>
+
+                <div class="state-flow">
+                    <div class="state">Pending</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Booked</div>
+                    <div class="arrow">→</div>
+                    <div class="state active">Dispatched</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Delivered</div>
+                </div>
+
+                <div class="data-flow">
+                    <h4>📊 Database Operations</h4>
+                    <div class="database-ops">
+                        <div class="db-op">UPDATE shipments SET state='dispatched'</div>
+                        <div class="db-op">INSERT documents (documentable_type='shipment')</div>
+                        <div class="db-op">INSERT notes (noteable_type='shipment')</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow-section">
+            <h2 class="section-title">🚛 Phase 5: Shipment Tracking</h2>
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">5</div>
+                    <div class="phase-title">In Transit Management</div>
+                </div>
+
+                <div class="actors">
+                    <div class="actor broker">Freight Broker</div>
+                    <div class="actor">Truck Driver</div>
+                    <div class="actor">Customer</div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-action">📞 Check Calls</div>
+                        <div class="step-description">Regular updates from driver</div>
+                        <div class="code-snippet">CreateCheckCall::handle($updateData)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📍 Status Updates</div>
+                        <div class="step-description">Track progress: AtPickup → InTransit → AtDelivery</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📝 Communication Log</div>
+                        <div class="step-description">Record all interactions and issues</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">🚨 Exception Handling</div>
+                        <div class="step-description">Deal with delays, breakdowns, route changes</div>
+                    </div>
+                </div>
+
+                <div class="state-flow">
+                    <div class="state">AtPickup</div>
+                    <div class="arrow">→</div>
+                    <div class="state active">InTransit</div>
+                    <div class="arrow">→</div>
+                    <div class="state">AtDelivery</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Delivered</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow-section">
+            <h2 class="section-title">💰 Phase 6: Delivery & Financial Settlement</h2>
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-number">6</div>
+                    <div class="phase-title">Completion & Payment</div>
+                </div>
+
+                <div class="actors">
+                    <div class="actor">Consignee (Receiver)</div>
+                    <div class="actor broker">Freight Broker</div>
+                    <div class="actor">Accounting</div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-action">✅ Delivery Confirmation</div>
+                        <div class="step-description">Proof of delivery received</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">📄 Generate Invoice</div>
+                        <div class="step-description">Bill customer for services</div>
+                        <div class="code-snippet">GenerateCustomerInvoice::handle($shipment)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">💸 Process Receivables</div>
+                        <div class="step-description">Record money owed by customer</div>
+                        <div class="code-snippet">SaveReceivables::handle($invoiceData)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-action">💰 Process Payables</div>
+                        <div class="step-description">Record money owed to carrier</div>
+                        <div class="code-snippet">SavePayables::handle($paymentData)</div>
+                    </div>
+                </div>
+
+                <div class="state-flow">
+                    <div class="state">Pending</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Booked</div>
+                    <div class="arrow">→</div>
+                    <div class="state">Dispatched</div>
+                    <div class="arrow">→</div>
+                    <div class="state active">Delivered</div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>💼 Financial Summary</h4>
+                    <p><strong>Revenue:</strong> Invoice customer $3,000<br>
+                    <strong>Cost:</strong> Pay carrier $2,500<br>
+                    <strong>Gross Profit:</strong> $500 (16.7% margin)</p>
+                </div>
+
+                <div class="data-flow">
+                    <h4>📊 Final Database Operations</h4>
+                    <div class="database-ops">
+                        <div class="db-op">UPDATE shipments SET state='delivered'</div>
+                        <div class="db-op">INSERT receivables (amount=3000, customer_id)</div>
+                        <div class="db-op">INSERT payables (amount=2500, carrier_id)</div>
+                        <div class="db-op">INSERT documents (type='customer_invoice')</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow-section">
+            <h2 class="section-title">🔄 System Architecture Flow</h2>
+            <div class="highlight-box">
+                <h4>🏗️ Technical Implementation</h4>
+                <p><strong>Frontend:</strong> React + TypeScript + Inertia.js (SPA experience)<br>
+                <strong>Backend:</strong> Laravel Actions (business logic) + Eloquent ORM<br>
+                <strong>Database:</strong> Multi-tenant with automatic organization scoping<br>
+                <strong>Real-time:</strong> Event bus for live updates across components</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
